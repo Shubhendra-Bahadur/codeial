@@ -11,5 +11,9 @@
     <%- include ('header'); %>
     <p>hello user</p>
     <%- include ('footer'); %>
+    <br><br>
+    <p>Name:<%=user.name%></p>
+    <p>Email:<%=user.email%></p>
+    <a href="/users/end_session" method="post">sign out</a>
   </body>
 </html>
