@@ -1,4 +1,4 @@
-const { request } = require("express");
+const express = require("express");
 const passport = require("passport");
 
 const LocalStrategy = require("passport-local").Strategy;
@@ -15,7 +15,7 @@ passport.use(
       // find a user and establish the identity
       User.findOne({ email: email }, function (err, user) {
         if (err) {
-          console.log("error in finding user ---> passport");
+          console.log("error in finding user --> passport");
           return done(err);
         }
 
@@ -40,14 +40,33 @@ passport.serializeUser(function (user, done) {
 //deserialize user
 
 passport.deserializeUser(function (id, done) {
-  User.findOne(id, function (err, user) {
+  User.findById(id, function (err, user) {
     if (err) {
       console.log("error in finding user ---> passport");
       return done(err);
     }
 
-    return done(null,user);
+    return done(null, user);
   });
 });
 
-module.exports=passport;
+//check if user is authenticated
+passport.checkAuthentication=function(req,res,next){
+    if(req.isAuthenticated()){
+        return next();
+    }
+    return res.redirect('/users/sign-in');
+}
+
+passport.setAuthenticatedUser=function(req,res,next){
+    if(req.isAuthenticated()){
+        // console.log(req.user);
+        // console.log(req.local);
+        res.locals.user=req.user;
+        // console.log(req.local);
+    }
+
+    next();
+}
+
+module.exports = passport;

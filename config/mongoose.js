@@ -8,4 +8,4 @@ db.once('open',function()
     console.log("database is succesfully running");
 })
 
-module.exports-db;
+module.exports=db;
