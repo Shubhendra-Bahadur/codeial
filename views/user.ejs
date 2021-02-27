@@ -5,13 +5,23 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title><%=title%></title>
-    <link rel="stylesheet" href="/css/user.css">
+    <link rel="stylesheet" href="/css/user.css" />
   </head>
   <body>
     <!-- <%- include ('header'); %> -->
     <p>hello user</p>
-    <p><%=user.name%></p>
-    <p><%=user.email%></p>
     <!-- <%- include ('footer'); %> -->
+    <%if(user.id==profile_user.id){%>
+    <!-- if user mathches then show the form -->
+    <form action="/users/update/<%=profile_user.id%>" method="POST">
+      <input type="text" name="name" placeholder="your name" value="<%=profile_user.name%>" required>
+      <input type="email" name="email" placeholder="your email" value="<%=profile_user.email%>" required>
+      <input type="submit" value="update">
+    </form>
+    <%}else{%>
+    <!-- else show profile info -->
+    <p><%=profile_user.name%></p>
+    <p><%=profile_user.email%></p>
+    <%}%>
   </body>
 </html>
