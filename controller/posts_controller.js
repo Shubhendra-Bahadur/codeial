@@ -1,19 +1,29 @@
 const Post = require("../modals/posts_db");
-const comment=require("../modals/comment");
-module.exports.create = function (req, res) {
-  Post.create(
-    {
+const comment = require("../modals/comment");
+module.exports.create = async function (req, res) {
+  try {
+    let post=await Post.create({
       content: req.body.content,
       user: req.user._id,
-    },
-    function (err, user) {
-      if (err) {
-        console.log("error in creating post", err);
-        return;
-      }
-      return res.redirect("back");
+    });
+
+    if(req.xhr){
+      // console.log("hello");
+      // console.log(post);
+      return res.status(200).json({
+        data:{
+          post:post
+        },
+        message:"post created!"
+      })
     }
-  );
+
+    req.flash('success',"post created");
+    return res.redirect("back");
+  } catch (err) {
+    req.flash('error',err);
+    return res.redirect("back");
+  }
 };
 
 // module.exports.delete = function (req, res) {
@@ -27,18 +37,37 @@ module.exports.create = function (req, res) {
 //       }
 //       return res.redirect("back");
 //   })
-  
+
 // };
-module.exports.delete = function (req, res) {
-  Post.findById(req.params.id,function(err,post){
-    //.id converts ._id into strings
-    if(post.user==req.user.id){
+module.exports.delete = async function (req, res) {
+  try {
+    let post = await Post.findById(req.params.id);
+    // console.log(req);
+    // console.log(req.xhr);
+    if (post.user == req.user.id) {
       post.remove();
-      comment.deleteMany({post:req.params.id},function(err){
-        return res.redirect("back");
-      })
-      }else{
-        return res.redirect("back");
+      // console.log("bhkk1");
+      await comment.deleteMany({ post: req.params.id });
+
+      if(req.xhr){
+        console.log("hello");
+        return res.status(200).json({
+          data:{
+            post_id:req.params.id
+          },
+          message:"post deleted"
+        })
+      }
+
+      req.flash('success',"Post deleted");
+      return res.redirect("back");
+
+    } else {
+      req.flash('err',"you cannot delete that post");
+      return res.redirect("back");
     }
-  })
-}
+  } catch (err) {
+    req.flash('error',err);
+    return;
+  }
+};

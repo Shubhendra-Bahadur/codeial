@@ -57,11 +57,15 @@ module.exports.create = function (
 };
 
 module.exports.createSession = function (req, res) {
+  req.flash('success','Logged in Succesfully');
   return res.redirect("/");
 };
 
 module.exports.endSession = function (req, res) {
+
   req.logout();
+  req.flash('success','Logged out Succesfully');
+
   return res.redirect("/");
 };
 
@@ -84,3 +88,4 @@ module.exports.update = function (req, res) {
     return res.status(401).send('unauthorised');
   }
 };
+

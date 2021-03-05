@@ -1,42 +1,46 @@
 const Comment = require("../modals/comment");
 const Post = require("../modals/posts_db");
 
-module.exports.create = function (req, res) {
+module.exports.create = async function (req, res) {
   // console.log(req);
-  Post.findById(req.body.post, function (err, post) {
+  try {
+    let post = await Post.findById(req.body.post);
+
     if (post) {
-      Comment.create(
-        {
-          content: req.body.content,
-          post: req.body.post,
-          user: req.user._id,
-        },
-        function (err, comment) {
-          if (err) {
-            console.log("error in creating comment ", err);
-            return;
-          }
-          post.comments.push(comment);
-          post.save();
-          return res.redirect("back");
-        }
-      );
+      let comment = await Comment.create({
+        content: req.body.content,
+        post: req.body.post,
+        user: req.user._id,
+      });
+      post.comments.push(comment);
+      post.save();
+      return res.redirect("back");
     }
-  });
+  } catch (err) {
+    console.log("error- ", err);
+    return;
+  }
 };
 
-module.exports.delete = function (req, res) {
-//   console.log(req);
-//   console.log(req.params);
-  Comment.findById(req.params.id, function (err, comment) {
-      let postID=comment.post;
+module.exports.delete = async function (req, res) {
+  //   console.log(req);
+  //   console.log(req.params);
+  try {
+    let comment = await Comment.findById(req.params.id);
+    if (comment.user == req.user.id) {
+      let postID = comment.post;
+
       comment.remove();
-      if (comment.user == req.user.id) {
-        Post.findByIdAndUpdate(postID, {$pull:{comments:req.params.id}},function(err,post){
-            return res.redirect("back");
-        });
+
+      let post = Post.findByIdAndUpdate(postID, {
+        $pull: { comments: req.params.id },
+      });
+      return res.redirect("back");
     } else {
       return res.redirect("back");
     }
-  });
+  } catch (err) {
+    console.log("error- ", err);
+    return;
+  }
 };
