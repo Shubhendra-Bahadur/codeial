@@ -48,9 +48,9 @@ module.exports.delete = async function (req, res) {
       post.remove();
       // console.log("bhkk1");
       await comment.deleteMany({ post: req.params.id });
-
+        // console.log(req.xhr);
       if(req.xhr){
-        console.log("hello");
+        // console.log("hello");
         return res.status(200).json({
           data:{
             post_id:req.params.id
